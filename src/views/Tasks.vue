@@ -3,7 +3,7 @@
         <div class="card">
             <app-filter v-model="filter"></app-filter>
         </div>
-        <h3 class="text-white">Количество задач: {{ tasksCount }}</h3>
+        <h3 class="text-white">{{ filteredTasks.length ? `Tasks count: ${tasksCount}` : 'No such tasks'}}</h3>
         <app-task-card
             v-for="task in filteredTasks" 
             :key="task.id"
@@ -22,10 +22,11 @@
     <app-loader 
         v-else-if="loading"
     ></app-loader>
-    <h1 v-else class="text-white center">Задач пока нет</h1>
+    <h1 v-else class="text-white center">No tasks yet</h1>
 </template>
 
 <script>
+import axios from 'axios'
 import AppTaskCard from '../components/AppTaskCard.vue'
 import AppFilter from '../components/AppFilter.vue'
 import AppLoader from '../components/AppLoader.vue'
@@ -34,6 +35,7 @@ import AppModal from '../components/AppModal.vue'
 export default {
     data() {
         return {
+			tasks: [],
             loading: true,
             filter: 'all',
             modal: false,
@@ -41,9 +43,6 @@ export default {
         }
     },
     computed: {
-        tasks() {
-            return this.$store.getters.tasks;
-        },
         filteredTasks() {
             return this.filter === 'all' ? this.tasks: this.tasks.filter(task => task.status === this.filter);
         },
@@ -61,11 +60,30 @@ export default {
             this.modal = false;
         },
         async fetchTasksHandler() {
-            await this.$store.dispatch('fetchTasks');
-            this.loading = false;
+            try {
+                const {data} = await axios.get(`${process.env.VUE_APP_FB_URL}tasks.json`);
+
+                if (data) {
+                    this.tasks = Object.keys(data).map(id => {
+                        return {
+                            id,
+                            ...data[id]
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Error during getting tasks from Firebase:', e);
+            } finally {
+				this.loading = false;
+			}
         },
         async removeTask(id) {
-            await this.$store.dispatch('removeTask', id);
+            try {
+                await axios.delete(`${process.env.VUE_APP_FB_URL}tasks/${id}.json`);
+				this.tasks = this.tasks.filter(task => task.id !== id);
+            } catch (e) {
+                console.error(`Error during removing task with ID ${id} from Firebase:`, e);
+            }
         }
     },
     mounted() {

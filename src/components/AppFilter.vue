@@ -1,12 +1,12 @@
 <template>
     <div class="filter">
-        <div class="filter-title">Показать задачи </div>
+        <div class="filter-title">Show tasks</div>
         <select class="filter-select" v-model="selected">
-            <option value="all">Все</option>
-            <option value="active">Активные</option>
-            <option value="pending">Выполняются</option>
-            <option value="done">Завершены</option>
-            <option value="cancelled">Отменены</option>
+            <option value="all">All</option>
+            <option value="queue">Queue</option>
+            <option value="doing">In progress</option>
+            <option value="completed">Completed</option>
+            <option value="canceled">Canceled</option>
         </select>
     </div>
 </template>
@@ -20,11 +20,11 @@ export default {
     computed: {
         selected: {
             get() { 
-                console.log('Get filter value: ' + this.modelValue);
+                // console.log('Get filter value: ' + this.modelValue);
                 return this.modelValue;
             },
             set(value) { 
-                console.log('Set filter value: ' + value);
+                // console.log('Set filter value: ' + value);
                 this.$emit('update:modelValue', value);
             }
         }

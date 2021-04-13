@@ -12,8 +12,8 @@
             </strong>
         </p>
         <div class="card-footer">
-            <button class="btn primary" @click="open(task.id)">Посмотреть</button>
-            <button class="btn danger" @click="remove">Удалить</button>
+            <button class="btn primary" @click="open(task.id)">View</button>
+            <button class="btn danger" @click="remove">Delete</button>
         </div>
     </div>
 </template>

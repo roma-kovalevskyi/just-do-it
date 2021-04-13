@@ -1,11 +1,11 @@
 <template>
     <div class="modal-backdrop" @click="$emit('close')"></div>
     <div class="modal">
-        <h2>Внимание!</h2>
-        <p>Вы уверены, что хотите удалить данную задачу?</p>
+        <h2>Attention!</h2>
+        <p>Do you really want to delete this task?</p>
         <div class="modal-buttons">
-            <button class="btn primary" @click="confirmRemove">Да</button>
-            <button class="btn" @click="$emit('close')">Нет</button>
+            <button class="btn primary" @click="confirmRemove">Yes</button>
+            <button class="btn" @click="$emit('close')">No</button>
         </div>
     </div>
 </template>

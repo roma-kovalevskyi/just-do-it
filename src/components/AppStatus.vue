@@ -10,27 +10,30 @@ export default {
     props: {
         type: {
             type: String,
-            required: true
+            required: true,
+            validator(value) {
+                return ['queue', 'doing', 'completed', 'canceled'].includes(value);
+            }
         },
     },
     data() {
         return {
             statuses: {
-                active: {
-                    class: 'primary',
-                    text: 'Активен'
-                },
-                done: {
-                    class: 'primary',
-                    text: 'Завершен'
-                },
-                cancelled: {
-                    class: 'danger',
-                    text: 'Отменен'
-                },
-                pending: {
+                queue: {
                     class: 'warning',
-                    text: 'Выполняется'
+                    text: 'Queue'
+                },
+                completed: {
+                    class: 'primary',
+                    text: 'Completed'
+                },
+                canceled: {
+                    class: 'danger',
+                    text: 'Canceled'
+                },
+                doing: {
+                    class: 'warning',
+                    text: 'In progress'
                 }
             }
         }

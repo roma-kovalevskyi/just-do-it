@@ -4,24 +4,24 @@
         class="card"
     >
         <h2>{{ task.title }}</h2>
-        <p><strong>Статус</strong>: <app-status :type="task.status" ></app-status></p>
-        <p><strong>Дэдлайн</strong>: {{ task.deadline }}</p>
-        <p><strong>Описание</strong>: {{ task.description }}</p>
+        <p><strong>Status</strong>: <app-status :type="task.status" ></app-status></p>
+        <p><strong>Deadline</strong>: {{ task.deadline }}</p>
+        <p><strong>Description</strong>: {{ task.description }}</p>
         <div>
             <button 
                 class="btn" 
-                @click="changeStatus('pending')">
-                    Взять в работу
+                @click="changeStatus('doing')">
+                    Start doing
             </button>
             <button 
                 class="btn primary" 
-                @click="changeStatus('done')">
-                    Завершить
+                @click="changeStatus('completed')">
+                    Complete
             </button>
             <button 
                 class="btn danger" 
-                @click="changeStatus('cancelled')">
-                    Отменить
+                @click="changeStatus('canceled')">
+                    Cancel
             </button>
         </div>
     </div>
@@ -29,11 +29,12 @@
         v-else-if="loading"
     ></app-loader>
     <h3 v-else class="text-white center">
-        Задачи с id = <strong>{{ taskId }}</strong> нет.
+		There is no task with id <strong>{{ taskId }}</strong>
     </h3>
 </template>
 
 <script>
+import axios from 'axios'
 import AppStatus from '../components/AppStatus'
 import AppLoader from '../components/AppLoader'
 
@@ -41,24 +42,44 @@ export default {
     props: ['taskId'],
     data() {
         return {
+			task: null,
             loading: true
-        }
-    },
-    computed: {
-        task() {
-            return this.$store.getters.taskById;
         }
     },
     methods: {
         async fetchTaskById() {
-            await this.$store.dispatch('fetchTaskById', this.taskId);
-            this.loading = false;
+            try {
+                const {data} = await axios.get(`${process.env.VUE_APP_FB_URL}tasks/${this.taskId}.json`);   
+				
+                if (data) {
+                    this.task = {
+                        id: this.taskId,
+                        ...data
+                    }
+                }
+            } catch (e) {
+                console.error(`Error during getting task by ID ${this.taskId} from Firebase:`, e);
+            } finally {
+            	this.loading = false;
+			}
         },
-        changeStatus(status) {
-            this.$store.dispatch('changeTaskStatus', {
-                taskId: this.taskId,
-                status
-            });
+        async changeStatus(status) {
+            try {              
+                const {data} = await axios.patch(`${process.env.VUE_APP_FB_URL}tasks/${this.taskId}.json`, 
+                    { 
+                        status
+                    }, 
+                    { 
+                        headers: {
+                            'Content-Type': 'application/json'
+                        } 
+                    }
+                );
+                
+				this.task.status = data.status;
+            } catch (e) {
+                console.error(`Error during updating task status with ID ${this.taskId} in Firebase:`, e);
+            }
         }
     },
     mounted() {

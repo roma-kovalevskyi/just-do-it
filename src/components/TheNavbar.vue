@@ -5,10 +5,10 @@
         </h3>
         <ul class="navbar-menu">
             <li>
-                <router-link to="/">Все задачи</router-link>
+                <router-link to="/">All tasks</router-link>
             </li>
             <li>
-                <router-link to="/new">Создать</router-link>
+                <router-link to="/new">Create</router-link>
             </li>
         </ul>
     </nav>

@@ -3,25 +3,26 @@
         v-if="loading"
     ></app-loader>
     <form v-else class="card" @submit.prevent="createTask">
-        <h1>Создать новую задачу</h1>
+        <h1>Create new task</h1>
         <div class="form-control">
-            <label for="title">Название</label>
+            <label for="title">Title</label>
             <input type="text" id="title" v-model.trim="title">
         </div>
         <div class="form-control">
-            <label for="date">Дата дэдлайна</label>
+            <label for="date">Deadline</label>
             <input type="date" id="date" v-model="deadline">
         </div>
         <div class="form-control">
-            <label for="description">Описание</label>
+            <label for="description">Description</label>
             <textarea id="description" v-model.trim="description"></textarea>
         </div>
-        <button class="btn primary" :disabled="!isValidTask">Создать</button>
+        <button class="btn primary" :disabled="!isValidTask">Create</button>
     </form>
 </template>
 
 
 <script>
+import axios from 'axios'
 import AppLoader from '../components/AppLoader.vue'
 
 export default {
@@ -42,7 +43,7 @@ export default {
             return new Date(this.deadline).toLocaleDateString();
         },
         taskStatus() {
-            return new Date(this.deadline) < new Date() ? 'cancelled': 'active';
+            return new Date(this.deadline) < new Date() ? 'canceled': 'queue';
         }
     },
     methods: {
@@ -55,8 +56,20 @@ export default {
             }
 
             this.loading = true;
-            await this.$store.dispatch('addTask', newTask);
-            this.loading = false;
+			
+            try {              
+                await axios.post(`${process.env.VUE_APP_FB_URL}tasks.json`, 
+                    newTask, { 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    } 
+                });
+            } catch (e) {
+                console.error('Error during adding task to Firebase:', e);
+            } finally {
+				this.loading = false;
+			}
+			
             this.$router.push('/');
         },
     },
