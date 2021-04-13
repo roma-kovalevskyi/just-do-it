@@ -1,4 +1,4 @@
-# coursework-3
+# Just Do It
 
 ## Project setup
 ```
